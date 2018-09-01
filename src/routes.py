@@ -1,4 +1,5 @@
 from termcolor import cprint
+import pandas as pd
 import hashlib, json, requests, fbprophet
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -15,29 +16,22 @@ def coisa():
     values = request.get_json()
     ds = values.get('ds')
     y = values.get('y')
-    print('values', values.keys())
+    df = pd.DataFrame(values)
+    #------------------------------------------------------------->
+    df_prophet = fbprophet.Prophet(changepoint_prior_scale=0.05)
+    df_prophet.fit(df)
+    #------------------------------------------------------------->
+    df_forecast = df_prophet.make_future_dataframe(periods=int(1))
+    df_forecast = df_prophet.predict(df_forecast)
+    df_forecast.to_json(orient='columns')
+    # print(df_forecast.keys())
     if ds is None:
-        return "Error: routes.py:17, ds is None"
-    print('\n')
-    print('api',str(y[:10]))
-    print('\n')
-    return jsonify({'ds': ds[:10], 'y': y[:10]}), 200
-
-
-
-@app.route('/nodes/register', methods=['POST'])
-def register_nodes():
-    values = request.get_json()
-    nodes = values.get('nodes')
-    
-    if nodes is None:
-        return "Error: line 240, please suppply a valid list of nodes", 400
-
-    for node in nodes:
-        blockchain.register_node(node)
-
-    response = {
-        'message': 'Nodes {} have been added'.format(nodes),
-        'total_nodes': list(blockchain.nodes)
-    }
-    return jsonify(response), 201
+        return "Error: routes.py:17, ds is None", 400
+    return jsonify({
+        'ds': ds,
+        'y': y,
+        'yhat': df_forecast['yhat'].tolist(),
+        'trend': df_forecast['trend'].tolist(),
+        'yhat_upper': df_forecast['yhat_upper'].tolist(),
+        'yhat_lower': df_forecast['yhat_lower'].tolist()
+    }), 201
