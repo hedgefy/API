@@ -44,7 +44,7 @@ if __name__ == '__main__':
         if ds is None:
             return "Error: routes.py:17, ds is None", 400
         return jsonify({
-            'ds': ds,
+            'ds': df_forecast.ds.tolist(),
             'y': y,
             'yhat': df_forecast['yhat'].tolist(),
             'trend': df_forecast['trend'].tolist(),
