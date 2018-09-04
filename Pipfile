@@ -1,0 +1,11 @@
+[packages]
+
+pystan = "*"
+gunicorn = "*"
+pandas = "*"
+fbprophet = "*"
+
+
+[requires]
+
+python_version = "3.6"
