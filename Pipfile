@@ -4,6 +4,7 @@ pystan = "*"
 gunicorn = "*"
 pandas = "*"
 flask = "*"
+flask_cors = "*"
 fbprophet = "*"
 
 
