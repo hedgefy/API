@@ -3,6 +3,7 @@
 pystan = "*"
 gunicorn = "*"
 pandas = "*"
+flask = "*"
 fbprophet = "*"
 
 
