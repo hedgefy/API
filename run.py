@@ -38,4 +38,4 @@ def prophet():
         'yhat_lower': df_forecast['yhat_lower'].tolist()
     }), 201
 
-app.run(host='127.0.0.1', port=5001)
+app.run(host='127.0.0.1', port=33507)
