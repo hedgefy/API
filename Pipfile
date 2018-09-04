@@ -3,7 +3,7 @@
 pystan = "*"
 gunicorn = "*"
 pandas = "*"
-flask = "*"
+Flask = "*"
 flask_cors = "*"
 matplotlib = "*"
 fbprophet = "*"
