@@ -1,5 +1,5 @@
 import pandas as pd
-import hashlib, json, requests, fbprophet
+import json, fbprophet, os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 try:
@@ -37,5 +37,5 @@ def prophet():
         'yhat_upper': df_forecast['yhat_upper'].tolist(),
         'yhat_lower': df_forecast['yhat_lower'].tolist()
     }), 201
-
-app.run(host='127.0.0.1', port=33507)
+port = int(os.environ.get('PORT', 5000))
+app.run(host='127.0.0.1', port=port)
