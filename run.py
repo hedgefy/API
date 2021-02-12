@@ -4,6 +4,7 @@ import matplotlib
 import fbprophet
 import os
 import requests
+import datetime
 from flask_restful import reqparse
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -14,13 +15,31 @@ app = Flask(__name__)
 CORS(app)
 
 TOKEN_NAME_TO_ID = {
-    'sXAU': '6191',
-    'iBTC': '6200',
+    'SNX': '2586',
     'BTC': '1',
-    'BNB': '1839',
     'ETH': '1027',
+    'YFI': '5864',
+    'CRV': '6538',
+    'AAVE': '7278',
+    'UNI': '7083',
+    'sXAU': '6191',
+    'sXAG': '5863',
+    'iBTC': '6200',
     'iETH': '6188',
 }
+
+
+def get_actual_epoch() -> int:
+    return int(datetime.datetime.now().timestamp())
+
+
+def get_url(asset_id: int) -> str:
+    actual_timestamp = str(get_actual_epoch())
+    feb_11_timestamp = str(1518389909)
+    url = 'https://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?convert=USD&format=chart_crypto_details&id=' + \
+        str(asset_id)+'&interval=1d&time_end=' + \
+        actual_timestamp+'&time_start='+feb_11_timestamp
+    return url
 
 
 class Hedgefy(FlaskView):
@@ -31,13 +50,20 @@ class Hedgefy(FlaskView):
 
     @route('/prophet', methods=['POST'])
     def prophet(self):
-        parser = reqparse.RequestParser(bundle_errors=True)
-        parser.add_argument('assets', type=list)
-        parser.add_argument('currency', type=str)
-        parser.add_argument('theta', type=float)
-        parser.add_argument('data-length', type=str)
-        parser.add_argument('forecast-days', type=str)
-        args = parser.parse_args()
+        for asset, asset_id in TOKEN_NAME_TO_ID.items():
+            coinmarketcap_api_url = get_url(asset_id)
+            res = requests.get(coinmarketcap_api_url).json()
+            historical_data_from_api: list = res['data']
+            foo = {
+                'ds': [],
+                'y': []
+            }
+            for (timestamp, price_obj) in historical_data_from_api.items():
+                foo['ds'].append(timestamp)
+                foo['y'].append(price_obj['USD'][0])
+            self.historical_data[asset] = foo
+        return jsonify({'historical_data': self.historical_data}), 201
+
         res = requests.get(
             'https://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?convert=USD&format=chart_crypto_details&id=6191&interval=1d&time_end=1612407600&time_start=1597017600')
         return res.json(), 201
@@ -82,5 +108,6 @@ class Hedgefy(FlaskView):
 Hedgefy.register(app, route_base='/')
 
 if __name__ == "__main__":
+    # start cron
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
