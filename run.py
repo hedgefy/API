@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import pandas as pd
 import json
 import matplotlib
@@ -16,17 +18,26 @@ CORS(app)
 
 TOKEN_NAME_TO_ID = {
     'SNX': '2586',
-    'BTC': '1',
-    'ETH': '1027',
-    'YFI': '5864',
-    'CRV': '6538',
-    'AAVE': '7278',
-    'UNI': '7083',
-    'sXAU': '6191',
-    'sXAG': '5863',
-    'iBTC': '6200',
-    'iETH': '6188',
+    # 'BTC': '1',
+    # 'ETH': '1027',
+    # 'YFI': '5864',
+    # 'CRV': '6538',
+    # 'AAVE': '7278',
+    # 'UNI': '7083',
+    # 'sXAU': '6191',
+    # 'sXAG': '5863',
+    # 'iBTC': '6200',
+    # 'iETH': '6188',
 }
+
+THETAS = [
+    # 0.01,
+    # 0.1,
+    # 0.5,
+    0.9
+]
+
+DAYS_TO_FORECAST = 35
 
 
 def get_actual_epoch() -> int:
@@ -44,65 +55,54 @@ def get_url(asset_id: int) -> str:
 
 class Hedgefy(FlaskView):
     def __init__(self):
-        self.thetas = [0.1, 0.5, 0.75, 1.0]
         self.historical_data = {}
         self.plot_ready_prophecy = {}
 
-    @route('/prophet', methods=['POST'])
+    @route('/prophet', methods=['GET'])
     def prophet(self):
-        for asset, asset_id in TOKEN_NAME_TO_ID.items():
+        self.fetch_historical_data()
+        self.gen_prophecy()
+
+        return jsonify({'plot_ready_prophecy': self.plot_ready_prophecy}), 201
+
+    def fetch_historical_data(self):
+        for asset_name, asset_id in TOKEN_NAME_TO_ID.items():
             coinmarketcap_api_url = get_url(asset_id)
+            print('> Fetching {}'.format(asset_name))
             res = requests.get(coinmarketcap_api_url).json()
             historical_data_from_api: list = res['data']
-            foo = {
+            temp_dataset = {
                 'ds': [],
                 'y': []
             }
             for (timestamp, price_obj) in historical_data_from_api.items():
-                foo['ds'].append(timestamp)
-                foo['y'].append(price_obj['USD'][0])
-            self.historical_data[asset] = foo
-        return jsonify({'historical_data': self.historical_data}), 201
+                timestamp = timestamp.split('T')[0]
+                temp_dataset['ds'].append(timestamp)
+                temp_dataset['y'].append(price_obj['USD'][0])
+            self.historical_data[asset_name] = temp_dataset
 
-        res = requests.get(
-            'https://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?convert=USD&format=chart_crypto_details&id=6191&interval=1d&time_end=1612407600&time_start=1597017600')
-        return res.json(), 201
-        for asset in args.asset:
-            self.fetch_historical_data_for(asset)
-            for theta in self.thetas:
-                self.gen_prophecy_for(asset, theta)
-        data = self.plot_ready_prophecy
-        return jsonify({'data': data}), 201
-
-    def fetch_historical_data_for(self, asset: str):
-        res = requests.get(
-            'https://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?convert=USD,BTC&format=chart_crypto_details&id=6191&interval=1d&time_end=1612407600&time_start=1597017600')
-
-        self.historical_data[asset] = []
-
-    def gen_prophecy_for(self, asset: str, theta: float):
-        self.plot_ready_prophecy = {}
-        # ! refactor
-        # df = pd.DataFrame(dataset)
-        # # ------------------------------------------------------------->
-        # df_prophet = fbprophet.Prophet(
-        #     changepoint_prior_scale=changepoint_prior_scale)
-        # df_prophet.fit(df)
-        # # ------------------------------------------------------------->
-        # df_forecast = df_prophet.make_future_dataframe(periods=int(forecast_days))
-        # df_forecast = df_prophet.predict(df_forecast)
-        # df_forecast.to_json(orient='columns')
-        # # print(df_forecast.keys())
-        # if ds is None:
-        #     return "Error: routes.py:17, ds is None", 400
-        # return jsonify({
-        #     'ds': df_forecast.ds.tolist(),
-        #     'y': y,
-        #     'yhat': df_forecast['yhat'].tolist(),
-        #     'trend': df_forecast['trend'].tolist(),
-        #     'yhat_upper': df_forecast['yhat_upper'].tolist(),
-        #     'yhat_lower': df_forecast['yhat_lower'].tolist()
-        # }), 201
+    def gen_prophecy(self):
+        for (asset_name, asset_id) in TOKEN_NAME_TO_ID.items():
+            for theta in THETAS:
+                dataset = self.historical_data[asset_name]
+                df = pd.DataFrame(dataset)
+                print('> Generating {} {} prophey'.format(theta, asset_name))
+                df_prophet = fbprophet.Prophet(changepoint_prior_scale=theta)
+                df_prophet.fit(df)
+                df_forecast = df_prophet.make_future_dataframe(
+                    periods=int(DAYS_TO_FORECAST))
+                df_forecast = df_prophet.predict(df_forecast)
+                self.plot_ready_prophecy[asset_name] = {}
+                df_forecast.to_json(orient='columns')
+                self.plot_ready_prophecy[asset_name]['theta'] = theta
+                self.plot_ready_prophecy[asset_name]['prophecy'] = {
+                    'ds': df_forecast.ds.tolist(),
+                    'y': dataset['y'],
+                    'yhat': df_forecast['yhat'].tolist(),
+                    'trend': df_forecast['trend'].tolist(),
+                    'yhat_upper': df_forecast['yhat_upper'].tolist(),
+                    'yhat_lower': df_forecast['yhat_lower'].tolist(),
+                }
 
 
 Hedgefy.register(app, route_base='/')
