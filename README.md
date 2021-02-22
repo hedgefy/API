@@ -5,10 +5,7 @@ This is an implementation of [Facebook Prophet](https://facebook.github.io/proph
 ![bud](imgs/bud.jpg)
 
 ### Stack:
+
 > Flask + Prophet + Pandas + Heroku
 
 ## Test if API is running:
-
-```
-https://radiant-forest-48616.herokuapp.com/ping
-```
