@@ -18,23 +18,23 @@ CORS(app)
 
 TOKEN_NAME_TO_ID = {
     'SNX': '2586',
-    'BTC': '1',
-    'ETH': '1027',
-    'YFI': '5864',
-    'CRV': '6538',
-    'AAVE': '7278',
-    'UNI': '7083',
-    'sXAU': '6191',
-    'sXAG': '5863',
-    'iBTC': '6200',
-    'iETH': '6188',
+    # 'BTC': '1',
+    # 'ETH': '1027',
+    # 'YFI': '5864',
+    # 'CRV': '6538',
+    # 'AAVE': '7278',
+    # 'UNI': '7083',
+    # 'sXAU': '6191',
+    # 'sXAG': '5863',
+    # 'iBTC': '6200',
+    # 'iETH': '6188',
 }
 
 THETAS = [
     0.01,
-    0.1,
-    0.5,
-    0.9
+    # 0.1,
+    # 0.5,
+    # 0.9
 ]
 
 DAYS_TO_FORECAST = 35
@@ -94,6 +94,7 @@ class Hedgefy(FlaskView):
                 df_forecast = df_prophet.predict(df_forecast)
                 self.plot_ready_prophecy[asset_name] = {}
                 df_forecast.to_json(orient='columns')
+                df_forecast['ds'] = df_forecast['ds'].astype('int64')//1000000
                 self.plot_ready_prophecy[asset_name]['theta'] = theta
                 self.plot_ready_prophecy[asset_name]['prophecy'] = {
                     'ds': df_forecast.ds.tolist(),
