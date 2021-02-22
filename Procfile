@@ -1,1 +1,1 @@
-web: python run.py
+web: export FLASK_APP=run.py && export FLASK_ENV=production && flask run
