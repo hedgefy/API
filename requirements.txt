@@ -1,0 +1,50 @@
+aniso8601==7.0.0
+arviz @ file:///home/conda/feedstock_root/build_artifacts/arviz_1610935953864/work
+autopep8==1.5.4
+certifi==2020.12.5
+cftime @ file:///home/conda/feedstock_root/build_artifacts/cftime_1602504445174/work
+chardet==4.0.0
+click @ file:///home/linux1/recipes/ci/click_1610990599742/work
+convertdate==2.1.3
+cycler==0.10.0
+Cython @ file:///home/conda/feedstock_root/build_artifacts/cython_1602367295094/work
+ephem @ file:///home/conda/feedstock_root/build_artifacts/ephem_1602326504300/work
+fbprophet @ file:///home/conda/feedstock_root/build_artifacts/fbprophet_1599365532360/work
+Flask @ file:///home/ktietz/src/ci/flask_1611932660458/work
+Flask-Classful==0.14.2
+Flask-Cors==3.0.10
+Flask-RESTful==0.3.8
+graphql-core==2.3.2
+graphql-relay==2.0.1
+holidays @ file:///home/conda/feedstock_root/build_artifacts/holidays_1607273931200/work
+idna==2.10
+itsdangerous @ file:///home/ktietz/src/ci/itsdangerous_1611932585308/work
+Jinja2 @ file:///tmp/build/80754af9/jinja2_1612213139570/work
+kiwisolver @ file:///home/conda/feedstock_root/build_artifacts/kiwisolver_1604322295622/work
+korean-lunar-calendar @ file:///home/conda/feedstock_root/build_artifacts/korean_lunar_calendar_1589354365811/work
+LunarCalendar==0.0.9
+MarkupSafe==1.1.1
+matplotlib @ file:///tmp/build/80754af9/matplotlib-base_1603378225747/work
+netCDF4 @ file:///home/conda/feedstock_root/build_artifacts/netcdf4_1588329187916/work
+numpy==1.18.1
+olefile==0.46
+packaging @ file:///home/conda/feedstock_root/build_artifacts/packaging_1607785313469/work
+pandas==1.2.1
+Pillow @ file:///tmp/build/80754af9/pillow_1609786786540/work
+promise==2.3
+pycodestyle==2.6.0
+pyparsing==2.4.7
+pystan @ file:///home/conda/feedstock_root/build_artifacts/pystan_1598392747715/work
+python-dateutil==2.8.1
+pytz==2019.3
+requests==2.25.1
+Rx==1.6.1
+scipy @ file:///home/conda/feedstock_root/build_artifacts/scipy_1604304772019/work
+sip==4.19.13
+six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
+toml==0.10.2
+tornado @ file:///home/conda/feedstock_root/build_artifacts/tornado_1604105045397/work
+tqdm @ file:///home/conda/feedstock_root/build_artifacts/tqdm_1610419111160/work
+urllib3==1.26.3
+Werkzeug @ file:///home/ktietz/src/ci/werkzeug_1611932622770/work
+xarray @ file:///home/conda/feedstock_root/build_artifacts/xarray_1606798576866/work
