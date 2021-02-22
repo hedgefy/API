@@ -1,1 +1,1 @@
-web: export FLASK_APP=run.py && export FLASK_ENV=production && flask run
+web: gunicorn run:app --bind 0.0.0.0:${PORT}
